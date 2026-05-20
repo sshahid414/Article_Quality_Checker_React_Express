@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-bg: #0f1117;
+  --color-surface: #1a1d27;
+  --color-surface-2: #242836;
+  --color-border: #2e3345;
+  --color-text: #e8eaef;
+  --color-text-muted: #8b92a8;
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+  --color-pass: #22c55e;
+  --color-pass-bg: rgba(34, 197, 94, 0.12);
+  --color-warn: #f59e0b;
+  --color-warn-bg: rgba(245, 158, 11, 0.12);
+  --color-fail: #ef4444;
+  --color-fail-bg: rgba(239, 68, 68, 0.12);
+  --color-wordpress: #21759b;
+  --color-wordpress-hover: #1a5f7a;
+  --color-shopify: #96bf48;
+  --color-shopify-hover: #7a9a3a;
+  --radius-DEFAULT: 10px;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply box-border m-0 p-0;
+  }
+
+  body {
+    @apply min-h-screen bg-bg font-sans text-text leading-relaxed;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  button {
+    @apply cursor-pointer rounded-[10px] border-none text-sm font-semibold transition-[background,opacity] duration-150;
+    font-family: inherit;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed opacity-45;
+  }
+
+  input {
+    @apply w-full rounded-[10px] border border-border bg-surface px-3.5 py-2.5 text-sm text-text;
+    font-family: inherit;
+  }
+
+  input:focus {
+    @apply outline-2 outline-offset-1 outline-accent;
+  }
+
+  a {
+    @apply text-accent-hover;
+  }
+
+  code {
+    @apply rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[0.82rem];
+  }
+}
