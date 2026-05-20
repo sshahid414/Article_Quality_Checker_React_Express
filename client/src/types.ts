@@ -25,6 +25,7 @@ export interface ParsedArticle {
   metaDescription: string;
   articleTitle: string;
   articleHtml: string;
+  articleCss: string;
   images: ArticleImage[];
   links: ArticleLink[];
   productLinks: ArticleLink[];

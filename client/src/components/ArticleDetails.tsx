@@ -11,7 +11,7 @@ export function ArticleDetails({ article }: Props) {
 
   return (
     <section className="w-full rounded-xl border border-border bg-surface px-6 py-5">
-      <h2 className="mb-2 text-[1.05rem] font-semibold">Extracted Fields</h2>
+      <h2 className="mb-2 text-[1.05rem] font-semibold text-text">Extracted Fields</h2>
       <p className="mb-4 text-sm text-text-muted">
         WordPress-ready metadata and content separated for upload.
       </p>
@@ -51,7 +51,7 @@ function Field({ label, value }: { label: string; value: string }) {
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-muted">
         {label}
       </label>
-      <div className="rounded-md border border-border bg-surface-2 px-4 py-3 text-sm leading-normal">
+      <div className="rounded-md border border-border bg-surface-2 px-4 py-3 text-sm leading-normal text-text">
         {value || <em className="text-text-muted">Not found</em>}
       </div>
     </div>

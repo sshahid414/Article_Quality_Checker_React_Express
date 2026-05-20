@@ -10,7 +10,7 @@ const tagClass = 'rounded-full px-2 py-0.5 text-[0.68rem] font-semibold';
 export function ResourcesPanel({ images, productLinks }: Props) {
   return (
     <section className="w-full rounded-xl border border-border bg-surface px-6 py-5 h-full">
-      <h2 className="mb-2 text-[1.05rem] font-semibold">Images & Links</h2>
+      <h2 className="mb-2 text-[1.05rem] font-semibold text-text">Images & Links</h2>
 
       <div className="grid grid-cols-2 gap-6 max-[768px]:grid-cols-1 h-full">
         <div>
@@ -22,7 +22,7 @@ export function ResourcesPanel({ images, productLinks }: Props) {
               {images.map((img) => (
                 <li
                   key={img.label}
-                  className="rounded-md border border-border bg-surface-2 p-3 text-sm"
+                  className="rounded-md border border-border bg-surface-2 p-3 text-sm text-text"
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
                     <strong>{img.label}</strong>
@@ -64,7 +64,7 @@ export function ResourcesPanel({ images, productLinks }: Props) {
               {productLinks.map((link, i) => (
                 <li
                   key={i}
-                  className="rounded-md border border-border bg-surface-2 px-3 py-2.5 text-sm"
+                  className="rounded-md border border-border bg-surface-2 px-3 py-2.5 text-sm text-text"
                 >
                   <strong>{link.text}</strong>
                   <a

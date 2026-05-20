@@ -38,11 +38,23 @@
   }
 
   #root {
-    @apply min-h-screen;
+    @apply min-h-screen text-text;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  strong,
+  label {
+    color: inherit;
   }
 
   button {
-    @apply cursor-pointer rounded-md border-none text-sm font-semibold transition-[background, opacity] duration-150;
+    @apply cursor-pointer rounded-md border-none text-sm font-semibold transition-all duration-150;
     font-family: inherit;
   }
 

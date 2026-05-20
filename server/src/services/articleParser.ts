@@ -4,20 +4,22 @@ import { DEFAULT_DOC_URL, QUALITY_THRESHOLDS } from '../types.js';
 import {
   fetchArticleHtml,
   extractDocId,
+  extractDriveFileId,
   isGoogleDriveUrl,
   isProductLink,
   normalizeText,
   unwrapGoogleRedirect,
   checkPublicAccess,
   getExportUrl,
+  getDriveDirectViewUrl,
 } from '../utils/googleDocs.js';
 import { runQualityChecks } from './qualityChecker.js';
 
-function extractMetaField(cheerioResult: cheerio.CheerioAPI, label: string): string {
+function extractMetaField($: cheerio.CheerioAPI, label: string): string {
   let value = '';
 
-  cheerioResult('p').each((_, el) => {
-    const text = normalizeText(cheerioResult(el).text());
+  $('p').each((_, el) => {
+    const text = normalizeText($(el).text());
     if (text.toLowerCase().startsWith(`${label.toLowerCase()}:`)) {
       value = normalizeText(text.slice(label.length + 1));
       return false;
@@ -27,20 +29,20 @@ function extractMetaField(cheerioResult: cheerio.CheerioAPI, label: string): str
   return value;
 }
 
-function extractArticleTitle(cheerioResult: cheerio.CheerioAPI): string {
-  const h1 = cheerioResult('h1').first().text();
+function extractArticleTitle($: cheerio.CheerioAPI): string {
+  const h1 = $('h1').first().text();
   return normalizeText(h1);
 }
 
-function extractImages(cheerioResult: cheerio.CheerioAPI): Omit<ArticleImage, 'isPubliclyAccessible'>[] {
+function extractImages($: cheerio.CheerioAPI): Omit<ArticleImage, 'isPubliclyAccessible'>[] {
   const images: Omit<ArticleImage, 'isPubliclyAccessible'>[] = [];
 
-  cheerioResult('p').each((_, el) => {
-    const paragraph = cheerioResult(el);
+  $('p').each((_, el) => {
+    const paragraph = $(el);
     const text = normalizeText(paragraph.text());
 
     const imageLink = paragraph.find('a').filter((__, anchor) => {
-      const linkText = normalizeText(cheerioResult(anchor).text());
+      const linkText = normalizeText($(anchor).text());
       return /^IMAGE\s+\d+$/i.test(linkText);
     }).first();
 
@@ -64,12 +66,12 @@ function extractImages(cheerioResult: cheerio.CheerioAPI): Omit<ArticleImage, 'i
   return images;
 }
 
-function extractLinks(cheerioResult: cheerio.CheerioAPI): ArticleLink[] {
+function extractLinks($: cheerio.CheerioAPI): ArticleLink[] {
   const links: ArticleLink[] = [];
   const seen = new Set<string>();
 
-  cheerioResult('a[href]').each((_, el) => {
-    const anchor = cheerioResult(el);
+  $('a[href]').each((_, el) => {
+    const anchor = $(el);
     const rawUrl = anchor.attr('href') ?? '';
     const url = unwrapGoogleRedirect(rawUrl);
     const text = normalizeText(anchor.text());
@@ -90,8 +92,26 @@ function extractLinks(cheerioResult: cheerio.CheerioAPI): ArticleLink[] {
   return links;
 }
 
-function buildCleanArticleHtml(cheerioResult: cheerio.CheerioAPI): string {
-  const clone = cheerio.load(cheerioResult.html());
+function imageUrlForEmbed(url: string): string {
+  const direct = unwrapGoogleRedirect(url);
+  if (isGoogleDriveUrl(direct)) {
+    const fileId = extractDriveFileId(direct);
+    if (fileId) return getDriveDirectViewUrl(fileId);
+  }
+  return direct;
+}
+
+function extractDocStyles($: cheerio.CheerioAPI): string {
+  const parts: string[] = [];
+  $('style').each((_, el) => {
+    const content = $(el).html()?.trim();
+    if (content) parts.push(content);
+  });
+  return parts.join('\n');
+}
+
+function buildCleanArticleHtml($: cheerio.CheerioAPI): string {
+  const clone = cheerio.load($.html());
 
   clone('p').each((_, el) => {
     const paragraph = clone(el);
@@ -99,10 +119,25 @@ function buildCleanArticleHtml(cheerioResult: cheerio.CheerioAPI): string {
 
     if (/^Meta Title:/i.test(text) || /^Meta Description:/i.test(text)) {
       paragraph.remove();
+      return;
     }
-  });
 
-  clone('style').remove();
+    const imageLink = paragraph.find('a').filter((__, anchor) => {
+      const linkText = normalizeText(clone(anchor).text());
+      return /^IMAGE\s+\d+$/i.test(linkText);
+    }).first();
+
+    if (!imageLink.length) return;
+
+    const rawUrl = imageLink.attr('href') ?? '';
+    const src = imageUrlForEmbed(rawUrl);
+    const altMatch = text.match(/Alt tag:\s*[“"']?([^”"']+)[”"']?/i);
+    const alt = altMatch ? normalizeText(altMatch[1]) : '';
+
+    paragraph.html(
+      `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`,
+    );
+  });
 
   const body = clone('.doc-content').length ? clone('.doc-content') : clone('body');
   return body.html()?.trim() ?? '';
@@ -114,14 +149,15 @@ export async function parseArticle(docIdOrUrl: string = DEFAULT_DOC_URL): Promis
     : docIdOrUrl;
 
   const rawHtml = await fetchArticleHtml(docIdOrUrl);
-  const cheerioResult = cheerio.load(rawHtml);
+  const $ = cheerio.load(rawHtml);
 
-  const metaTitle = extractMetaField(cheerioResult, 'Meta Title');
-  const metaDescription = extractMetaField(cheerioResult, 'Meta Description');
-  const articleTitle = extractArticleTitle(cheerioResult);
-  const articleHtml = buildCleanArticleHtml(cheerioResult);
+  const metaTitle = extractMetaField($, 'Meta Title');
+  const metaDescription = extractMetaField($, 'Meta Description');
+  const articleTitle = extractArticleTitle($);
+  const articleCss = extractDocStyles($);
+  const articleHtml = buildCleanArticleHtml($);
 
-  const rawImages = extractImages(cheerioResult);
+  const rawImages = extractImages($);
   const images: ArticleImage[] = await Promise.all(
     rawImages.map(async (img) => ({
       ...img,
@@ -129,7 +165,7 @@ export async function parseArticle(docIdOrUrl: string = DEFAULT_DOC_URL): Promis
     }))
   );
 
-  const links = extractLinks(cheerioResult);
+  const links = extractLinks($);
   const productLinks = links.filter((link) => link.isProductLink);
 
   const qualityChecks = runQualityChecks({
@@ -149,6 +185,7 @@ export async function parseArticle(docIdOrUrl: string = DEFAULT_DOC_URL): Promis
     metaDescription,
     articleTitle,
     articleHtml,
+    articleCss,
     images,
     links,
     productLinks,
@@ -165,10 +202,10 @@ export function buildWordPressHtml(article: ParsedArticle): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(article.metaTitle || article.articleTitle)}</title>
   <meta name="description" content="${escapeHtml(article.metaDescription)}">
+  ${article.articleCss ? `<style>\n${article.articleCss}\n</style>` : ''}
 </head>
 <body>
   <article>
-    <h1>${escapeHtml(article.articleTitle)}</h1>
     ${article.articleHtml}
   </article>
 </body>

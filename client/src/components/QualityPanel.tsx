@@ -15,7 +15,7 @@ export function QualityPanel({ checks, canUpload }: Props) {
   return (
     <section className="w-full rounded-xl border border-border bg-surface px-6 py-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-[1.05rem] font-semibold">Quality Checks</h2>
+        <h2 className="text-[1.05rem] font-semibold text-text">Quality Checks</h2>
         <div className="flex gap-2">
           <span className={`${badgeClass} bg-pass-bg text-pass`}>{passCount} pass</span>
           <span className={`${badgeClass} bg-warn-bg text-warn`}>{warnCount} warn</span>
@@ -55,7 +55,7 @@ export function QualityPanel({ checks, canUpload }: Props) {
             >
               {check.status === 'pass' ? '✓' : check.status === 'warn' ? '!' : '✗'}
             </span>
-            <div>
+            <div className="text-text">
               <strong>{check.label}</strong>
               <p className="mt-0.5 text-sm text-text-muted">{check.message}</p>
             </div>

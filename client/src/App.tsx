@@ -48,13 +48,13 @@ export default function App() {
       <header className="border-b border-border bg-surface px-8 py-6 max-[600px]:px-4 max-[600px]:py-4">
         <div className="mx-auto flex max-w-[1700px] items-center justify-between gap-5">
           <div>
-            <h1 className="text-2xl font-bold">Article Quality Checker</h1>
+            <h1 className="text-2xl font-bold text-text">Article Quality Checker</h1>
             <p className="mt-1 text-sm text-text-muted">
               Parse Google Docs, validate SEO quality, and upload to WordPress or Shopify
             </p>
           </div>
           <div className={panelClass}>
-            <h2 className="mb-2 text-[1.05rem] font-semibold">Google Doc Source</h2>
+            <h2 className="mb-2 text-[1.05rem] font-semibold text-text">Google Doc Source</h2>
             <div className="flex gap-3 max-[900px]:flex-col">
               <input
                 type="url"
@@ -95,7 +95,7 @@ export default function App() {
             )}
             <div className="grid grid-cols-3 gap-5 max-[900px]:grid-cols-1">
               <div className='col-span-2'>
-                <ArticlePreview html={article.articleHtml} />
+                <ArticlePreview html={article.articleHtml} css={article.articleCss} />
               </div>
               <ArticleDetails article={article} />
             </div>
