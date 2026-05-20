@@ -13,11 +13,11 @@ import {
 } from '../utils/googleDocs.js';
 import { runQualityChecks } from './qualityChecker.js';
 
-function extractMetaField($: cheerio.CheerioAPI, label: string): string {
+function extractMetaField(cheerioResult: cheerio.CheerioAPI, label: string): string {
   let value = '';
 
-  $('p').each((_, el) => {
-    const text = normalizeText($(el).text());
+  cheerioResult('p').each((_, el) => {
+    const text = normalizeText(cheerioResult(el).text());
     if (text.toLowerCase().startsWith(`${label.toLowerCase()}:`)) {
       value = normalizeText(text.slice(label.length + 1));
       return false;
@@ -27,20 +27,20 @@ function extractMetaField($: cheerio.CheerioAPI, label: string): string {
   return value;
 }
 
-function extractArticleTitle($: cheerio.CheerioAPI): string {
-  const h1 = $('h1').first().text();
+function extractArticleTitle(cheerioResult: cheerio.CheerioAPI): string {
+  const h1 = cheerioResult('h1').first().text();
   return normalizeText(h1);
 }
 
-function extractImages($: cheerio.CheerioAPI): Omit<ArticleImage, 'isPubliclyAccessible'>[] {
+function extractImages(cheerioResult: cheerio.CheerioAPI): Omit<ArticleImage, 'isPubliclyAccessible'>[] {
   const images: Omit<ArticleImage, 'isPubliclyAccessible'>[] = [];
 
-  $('p').each((_, el) => {
-    const paragraph = $(el);
+  cheerioResult('p').each((_, el) => {
+    const paragraph = cheerioResult(el);
     const text = normalizeText(paragraph.text());
 
     const imageLink = paragraph.find('a').filter((__, anchor) => {
-      const linkText = normalizeText($(anchor).text());
+      const linkText = normalizeText(cheerioResult(anchor).text());
       return /^IMAGE\s+\d+$/i.test(linkText);
     }).first();
 
@@ -64,12 +64,12 @@ function extractImages($: cheerio.CheerioAPI): Omit<ArticleImage, 'isPubliclyAcc
   return images;
 }
 
-function extractLinks($: cheerio.CheerioAPI): ArticleLink[] {
+function extractLinks(cheerioResult: cheerio.CheerioAPI): ArticleLink[] {
   const links: ArticleLink[] = [];
   const seen = new Set<string>();
 
-  $('a[href]').each((_, el) => {
-    const anchor = $(el);
+  cheerioResult('a[href]').each((_, el) => {
+    const anchor = cheerioResult(el);
     const rawUrl = anchor.attr('href') ?? '';
     const url = unwrapGoogleRedirect(rawUrl);
     const text = normalizeText(anchor.text());
@@ -90,8 +90,8 @@ function extractLinks($: cheerio.CheerioAPI): ArticleLink[] {
   return links;
 }
 
-function buildCleanArticleHtml($: cheerio.CheerioAPI): string {
-  const clone = cheerio.load($.html());
+function buildCleanArticleHtml(cheerioResult: cheerio.CheerioAPI): string {
+  const clone = cheerio.load(cheerioResult.html());
 
   clone('p').each((_, el) => {
     const paragraph = clone(el);
@@ -114,14 +114,14 @@ export async function parseArticle(docIdOrUrl: string = DEFAULT_DOC_URL): Promis
     : docIdOrUrl;
 
   const rawHtml = await fetchArticleHtml(docIdOrUrl);
-  const $ = cheerio.load(rawHtml);
+  const cheerioResult = cheerio.load(rawHtml);
 
-  const metaTitle = extractMetaField($, 'Meta Title');
-  const metaDescription = extractMetaField($, 'Meta Description');
-  const articleTitle = extractArticleTitle($);
-  const articleHtml = buildCleanArticleHtml($);
+  const metaTitle = extractMetaField(cheerioResult, 'Meta Title');
+  const metaDescription = extractMetaField(cheerioResult, 'Meta Description');
+  const articleTitle = extractArticleTitle(cheerioResult);
+  const articleHtml = buildCleanArticleHtml(cheerioResult);
 
-  const rawImages = extractImages($);
+  const rawImages = extractImages(cheerioResult);
   const images: ArticleImage[] = await Promise.all(
     rawImages.map(async (img) => ({
       ...img,
@@ -129,7 +129,7 @@ export async function parseArticle(docIdOrUrl: string = DEFAULT_DOC_URL): Promis
     }))
   );
 
-  const links = extractLinks($);
+  const links = extractLinks(cheerioResult);
   const productLinks = links.filter((link) => link.isProductLink);
 
   const qualityChecks = runQualityChecks({
