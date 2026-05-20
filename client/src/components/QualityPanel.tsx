@@ -24,7 +24,7 @@ export function QualityPanel({ checks, canUpload }: Props) {
       </div>
 
       <div
-        className={`mb-4 rounded-[10px] px-4 py-3 text-sm font-semibold ${canUpload
+        className={`mb-4 rounded-md px-4 py-3 text-sm font-semibold ${canUpload
           ? 'border border-pass/25 bg-pass-bg text-pass'
           : 'border border-fail/25 bg-fail-bg text-fail'
           }`}
@@ -38,7 +38,7 @@ export function QualityPanel({ checks, canUpload }: Props) {
         {checks.map((check) => (
           <div
             key={check.id + check.label}
-            className={`flex gap-3 rounded-[10px] border border-border bg-surface-2 px-4 py-3 border-l-[3px] ${check.status === 'pass'
+            className={`flex gap-3 rounded-md border border-border bg-surface-2 px-4 py-3 border-l-[3px] ${check.status === 'pass'
               ? 'border-l-pass'
               : check.status === 'warn'
                 ? 'border-l-warn'

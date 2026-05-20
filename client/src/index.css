@@ -26,6 +26,7 @@
 }
 
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -41,7 +42,7 @@
   }
 
   button {
-    @apply cursor-pointer rounded-[10px] border-none text-sm font-semibold transition-[background,opacity] duration-150;
+    @apply cursor-pointer rounded-md border-none text-sm font-semibold transition-[background, opacity] duration-150;
     font-family: inherit;
   }
 
@@ -50,7 +51,7 @@
   }
 
   input {
-    @apply w-full rounded-[10px] border border-border bg-surface px-3.5 py-2.5 text-sm text-text;
+    @apply w-full rounded-md border border-border bg-surface px-3.5 py-2.5 text-sm text-text;
     font-family: inherit;
   }
 

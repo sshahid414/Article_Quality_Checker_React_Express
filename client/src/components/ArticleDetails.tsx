@@ -51,7 +51,7 @@ function Field({ label, value }: { label: string; value: string }) {
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-muted">
         {label}
       </label>
-      <div className="rounded-[10px] border border-border bg-surface-2 px-4 py-3 text-sm leading-normal">
+      <div className="rounded-md border border-border bg-surface-2 px-4 py-3 text-sm leading-normal">
         {value || <em className="text-text-muted">Not found</em>}
       </div>
     </div>
@@ -60,7 +60,7 @@ function Field({ label, value }: { label: string; value: string }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-[10px] border border-border bg-surface-2 p-4 text-center">
+    <div className="rounded-md border border-border bg-surface-2 p-4 text-center">
       <span className="block text-[1.75rem] font-bold text-accent-hover">{value}</span>
       <span className="text-[0.78rem] uppercase tracking-wide text-text-muted">{label}</span>
     </div>

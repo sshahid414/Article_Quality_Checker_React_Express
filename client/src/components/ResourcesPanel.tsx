@@ -22,7 +22,7 @@ export function ResourcesPanel({ images, productLinks }: Props) {
               {images.map((img) => (
                 <li
                   key={img.label}
-                  className="rounded-[10px] border border-border bg-surface-2 p-3 text-sm"
+                  className="rounded-md border border-border bg-surface-2 p-3 text-sm"
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
                     <strong>{img.label}</strong>
@@ -64,7 +64,7 @@ export function ResourcesPanel({ images, productLinks }: Props) {
               {productLinks.map((link, i) => (
                 <li
                   key={i}
-                  className="rounded-[10px] border border-border bg-surface-2 px-3 py-2.5 text-sm"
+                  className="rounded-md border border-border bg-surface-2 px-3 py-2.5 text-sm"
                 >
                   <strong>{link.text}</strong>
                   <a

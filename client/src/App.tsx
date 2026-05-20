@@ -76,7 +76,7 @@ export default function App() {
 
       <main className="mx-auto flex max-w-[1780px] flex-col gap-5 px-8 py-6 pb-12 max-[600px]:px-4 max-[600px]:py-4">
         {error && (
-          <div className="rounded-[10px] border border-fail/30 bg-fail-bg px-5 py-3.5 text-sm text-fail">
+          <div className="rounded-md border border-fail/30 bg-fail-bg px-5 py-3.5 text-sm text-fail">
             {error}
           </div>
         )}
@@ -84,7 +84,7 @@ export default function App() {
         {article && (
           <>
             {uploadResult && (
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-pass/30 bg-pass-bg px-5 py-3.5 text-sm text-pass">
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-pass/30 bg-pass-bg px-5 py-3.5 text-sm text-pass">
                 <span>
                   <strong>{uploadResult.platform}:</strong> {uploadResult.message}
                 </span>
