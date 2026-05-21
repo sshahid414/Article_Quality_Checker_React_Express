@@ -68,7 +68,6 @@ function extractImages($: cheerio.CheerioAPI): Omit<ArticleImage, 'isPubliclyAcc
 
 function extractLinks($: cheerio.CheerioAPI): ArticleLink[] {
   const links: ArticleLink[] = [];
-  const seen = new Set<string>();
 
   $('a[href]').each((_, el) => {
     const anchor = $(el);
@@ -77,10 +76,6 @@ function extractLinks($: cheerio.CheerioAPI): ArticleLink[] {
     const text = normalizeText(anchor.text());
 
     if (!url || url.startsWith('#') || /^IMAGE\s+\d+$/i.test(text)) return;
-
-    const key = `${url}::${text}`;
-    if (seen.has(key)) return;
-    seen.add(key);
 
     links.push({
       text: text || url,
