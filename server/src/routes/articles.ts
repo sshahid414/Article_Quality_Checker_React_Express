@@ -5,15 +5,12 @@ import { DEFAULT_DOC_URL } from '../types.js';
 
 export const articlesRouter = Router();
 
-articlesRouter.get('/parse', async (_req, res) => {
-  try {
-    const article = await parseArticle(DEFAULT_DOC_URL);
-    res.json(article);
-  } catch (error) {
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to parse article' });
-  }
-});
-
+/**
+ * Parse the article from the Google Doc
+ * @param req - The request object
+ * @param res - The response object
+ * @returns The parsed article
+ */
 articlesRouter.post('/parse', async (req, res) => {
   try {
     const { docUrl } = req.body as { docUrl?: string };
@@ -24,6 +21,12 @@ articlesRouter.post('/parse', async (req, res) => {
   }
 });
 
+/**
+ * This is just placeholder for the actual upload to WordPress.
+ * @param req - The request object
+ * @param res - The response object
+ * @returns The result of the upload
+ */
 articlesRouter.post('/upload/wordpress', async (req, res) => {
   try {
     const { docUrl } = req.body as { docUrl?: string };
@@ -44,6 +47,12 @@ articlesRouter.post('/upload/wordpress', async (req, res) => {
   }
 });
 
+/**
+ * This is just placeholder for the actual upload to Shopify.
+ * @param req - The request object
+ * @param res - The response object
+ * @returns The result of the upload
+ */
 articlesRouter.post('/upload/shopify', async (req, res) => {
   try {
     const { docUrl } = req.body as { docUrl?: string };
