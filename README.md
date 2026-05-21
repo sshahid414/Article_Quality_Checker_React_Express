@@ -51,10 +51,7 @@ Output files:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/articles/parse` | Parse default sample doc |
 | POST | `/api/articles/parse` | Parse doc from `{ docUrl }` |
-| POST | `/api/articles/upload/wordpress` | Placeholder WordPress upload |
-| POST | `/api/articles/upload/shopify` | Placeholder Shopify upload |
 
 ## Project Structure
 
