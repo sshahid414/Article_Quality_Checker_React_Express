@@ -105,6 +105,15 @@ function extractDocStyles($: cheerio.CheerioAPI): string {
   return parts.join('\n');
 }
 
+function unwrapAnchorHrefs($: cheerio.CheerioAPI): void {
+  $('a[href]').each((_, el) => {
+    const anchor = $(el);
+    const rawUrl = anchor.attr('href') ?? '';
+    const url = unwrapGoogleRedirect(rawUrl);
+    if (url) anchor.attr('href', url);
+  });
+}
+
 function buildCleanArticleHtml($: cheerio.CheerioAPI): string {
   const clone = cheerio.load($.html());
 
@@ -133,6 +142,8 @@ function buildCleanArticleHtml($: cheerio.CheerioAPI): string {
       `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`,
     );
   });
+
+  unwrapAnchorHrefs(clone);
 
   const body = clone('.doc-content').length ? clone('.doc-content') : clone('body');
   return body.html()?.trim() ?? '';
