@@ -138,15 +138,24 @@ function buildCleanArticleHtml($: cheerio.CheerioAPI): string {
     const altMatch = text.match(/Alt tag:\s*[“"']?([^”"']+)[”"']?/i);
     const alt = altMatch ? normalizeText(altMatch[1]) : '';
 
-    paragraph.html(
-      `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`,
-    );
+    const img = clone('<img />');
+    img.attr('src', src);
+    img.attr('alt', alt);
+    paragraph.empty().append(img);
   });
 
   unwrapAnchorHrefs(clone);
 
   const body = clone('.doc-content').length ? clone('.doc-content') : clone('body');
-  return body.html()?.trim() ?? '';
+  return fixImgSrcAmpersands(body.html()?.trim() ?? '');
+}
+
+/** Cheerio serializes `&` as `&amp;` in attributes; keep literal `&` in image URLs. */
+function fixImgSrcAmpersands(html: string): string {
+  return html.replace(
+    /(<img\b[^>]*\bsrc=")([^"]*)(")/gi,
+    (_, open, src, close) => `${open}${src.replace(/&amp;/g, '&')}${close}`,
+  );
 }
 
 export async function parseArticle(docIdOrUrl: string = DEFAULT_DOC_URL): Promise<ParsedArticle> {
